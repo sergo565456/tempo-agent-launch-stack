@@ -1,0 +1,35 @@
+{
+  "name": "tempo-outbound-signer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Policy-gated remote signer boundary for Tempo MPP agent outbound payments.",
+  "scripts": {
+    "start": "node src/server.js",
+    "smoke": "node scripts/smoke-test.js",
+    "smoke:vercel": "node scripts/vercel-handler-smoke.js",
+    "smoke:public": "node scripts/public-smoke-test.js",
+    "preflight:public-production": "node scripts/public-production-preflight.js",
+    "test": "node --test test/policy.test.js test/app.test.js test/turnkeyProvider.test.js test/envFiles.test.js test/ledger.test.js test/liveReadiness.test.js test/accessKeyReadiness.test.js test/accessKeySigningCapability.test.js test/publicProductionPreflight.test.js test/turnkeyLiveHandoff.test.js test/turnkeyPolicyDraft.test.js test/vercelEnvUploadHelper.test.js test/vercelDeployHelper.test.js",
+    "audit:local": "node scripts/security-audit-local.js",
+    "readiness:live": "node scripts/live-readiness-check.js",
+    "policy:draft": "node scripts/turnkey-policy-draft.js",
+    "preflight:turnkey-handoff": "node scripts/turnkey-live-handoff-check.js",
+    "readiness:access-key": "node scripts/tempo-access-key-readiness.js",
+    "access-key:turnkey-authorize": "node scripts/turnkey-authorize-access-key.js",
+    "readiness:access-key-signing": "node scripts/access-key-signing-capability.js"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "@turnkey/sdk-server": "^6.1.1",
+    "@turnkey/viem": "^0.14.31",
+    "mppx": "^0.8.4",
+    "tempo.ts": "^0.14.2",
+    "viem": "^2.54.1"
+  },
+  "overrides": {
+    "ws": "8.21.0"
+  }
+}
