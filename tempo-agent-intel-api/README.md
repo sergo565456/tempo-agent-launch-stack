@@ -34,13 +34,14 @@ This is narrower than a generic research agent and gives us a clearer reason for
 - [Development plan](docs/DEVELOPMENT_PLAN.md)
 - [Autonomous execution plan](docs/AUTONOMOUS_EXECUTION_PLAN.md)
 - [MVP specification](docs/MVP_SPEC.md)
-- [Implementation status](docs/IMPLEMENTATION_STATUS.md)
 - [Root wallet and Access Key setup](docs/ROOT_ACCESS_KEY_SETUP.md)
 - [Multi-rail MPP / x402 launch plan](docs/MULTIRAIL_MPP_X402_LAUNCH_PLAN.md)
 - [Security audit checklist](docs/SECURITY_AUDIT_CHECKLIST.md)
 - [Deployment and live payment runbook](docs/DEPLOYMENT_LIVE_PAYMENT_RUNBOOK.md)
 - [Recommended remote signer path](docs/RECOMMENDED_REMOTE_SIGNER_PATH.md)
 - [Public listing profile](docs/PUBLIC_LISTING_PROFILE.md)
+- [Repository public quickstart](../docs/PUBLIC_QUICKSTART.md)
+- [Listing and launch pack](../docs/LISTING_AND_LAUNCH_PACK.md)
 
 ## Current Local MVP
 
