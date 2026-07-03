@@ -79,6 +79,7 @@ export async function runPublicLiveNextStep(options, deps = defaultDeps) {
       agentUrl,
       baseUrl: agentUrl,
       agentAdminToken: options.agentAdminToken,
+      eventLimit: options.inboundEventLimit,
       ...inboundEvidence,
       allowHttp: options.allowHttp,
     })
@@ -91,6 +92,7 @@ export async function runPublicLiveNextStep(options, deps = defaultDeps) {
       agentAdminToken: options.agentAdminToken,
       signerAdminToken: options.signerAdminToken,
       idempotencyKey: outboundIdempotencyKey,
+      eventLimit: options.outboundEventLimit,
       allowHttp: options.allowHttp,
       expectedService: options.expectedService,
       expectedCommand: options.expectedCommand,
@@ -107,6 +109,7 @@ export async function runPublicLiveNextStep(options, deps = defaultDeps) {
       signerAdminToken: options.signerAdminToken,
       idempotencyKey: outboundIdempotencyKey,
       expectCronAuthGated,
+      eventLimit: options.outboundEventLimit,
       allowHttp: options.allowHttp,
       expectedService: options.expectedService,
       expectedCommand: options.expectedCommand,
@@ -125,6 +128,10 @@ export async function runPublicLiveNextStep(options, deps = defaultDeps) {
       inboundReportId: inboundEvidence.reportId,
       inboundReceiptId: inboundEvidence.receiptId,
       manualOutboundIdempotencyKey: outboundIdempotencyKey,
+      eventLimit: Math.max(
+        Number(options.inboundEventLimit || 0),
+        Number(options.outboundEventLimit || 0),
+      ) || undefined,
       expectCronAuthGated,
       expectCronReadyToEnable: !expectCronAuthGated,
       allowHttp: options.allowHttp,
@@ -142,6 +149,7 @@ export async function runPublicLiveNextStep(options, deps = defaultDeps) {
       agentAdminToken: options.agentAdminToken,
       signerAdminToken: options.signerAdminToken,
       idempotencyKey: expectedCronIdempotencyKey,
+      eventLimit: options.outboundEventLimit,
       allowHttp: options.allowHttp,
       expectedService: options.expectedService,
       expectedCommand: options.expectedCommand,
@@ -416,6 +424,8 @@ function parseArgs(args) {
     inboundIdempotencyKey: process.env.INBOUND_RECONCILE_IDEMPOTENCY_KEY || '',
     inboundReportId: process.env.INBOUND_RECONCILE_REPORT_ID || '',
     inboundReceiptId: process.env.INBOUND_RECONCILE_RECEIPT_ID || '',
+    inboundEventLimit: Number(process.env.INBOUND_RECONCILE_EVENT_LIMIT || 100),
+    outboundEventLimit: Number(process.env.OUTBOUND_RECONCILE_EVENT_LIMIT || process.env.INBOUND_RECONCILE_EVENT_LIMIT || 100),
     outboundIdempotencyKey: process.env.OUTBOUND_LIVE_IDEMPOTENCY_KEY || DEFAULT_OUTBOUND_IDEMPOTENCY_KEY,
     expectedCronIdempotencyKey: process.env.OUTBOUND_CRON_EXPECTED_IDEMPOTENCY_KEY || '',
     inboundAmountUsd: process.env.PUBLIC_INBOUND_AMOUNT_USD || DEFAULT_INBOUND_AMOUNT_USD,
@@ -459,6 +469,12 @@ function parseArgs(args) {
       i += 1;
     } else if (arg === '--inbound-receipt-id' && next) {
       values.inboundReceiptId = next;
+      i += 1;
+    } else if (arg === '--inbound-event-limit' && next) {
+      values.inboundEventLimit = Number(next);
+      i += 1;
+    } else if (arg === '--outbound-event-limit' && next) {
+      values.outboundEventLimit = Number(next);
       i += 1;
     } else if (arg === '--outbound-idempotency-key' && next) {
       values.outboundIdempotencyKey = next;

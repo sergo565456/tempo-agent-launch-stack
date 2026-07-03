@@ -54,6 +54,8 @@ export async function runPublicListingReadiness(options, deps = defaultDeps) {
     inboundIdempotencyKey: options.inboundIdempotencyKey,
     inboundReportId: options.inboundReportId,
     inboundReceiptId: options.inboundReceiptId,
+    inboundEventLimit: options.inboundEventLimit,
+    outboundEventLimit: options.outboundEventLimit,
     outboundIdempotencyKey: options.outboundIdempotencyKey || DEFAULT_OUTBOUND_IDEMPOTENCY_KEY,
     expectedCronIdempotencyKey: options.expectedCronIdempotencyKey,
     expectManualOutboundComplete: true,
@@ -282,6 +284,8 @@ function parseArgs(args) {
     inboundIdempotencyKey: process.env.INBOUND_RECONCILE_IDEMPOTENCY_KEY || '',
     inboundReportId: process.env.INBOUND_RECONCILE_REPORT_ID || '',
     inboundReceiptId: process.env.INBOUND_RECONCILE_RECEIPT_ID || '',
+    inboundEventLimit: Number(process.env.INBOUND_RECONCILE_EVENT_LIMIT || 100),
+    outboundEventLimit: Number(process.env.OUTBOUND_RECONCILE_EVENT_LIMIT || process.env.INBOUND_RECONCILE_EVENT_LIMIT || 100),
     outboundIdempotencyKey: process.env.OUTBOUND_LIVE_IDEMPOTENCY_KEY || DEFAULT_OUTBOUND_IDEMPOTENCY_KEY,
     expectedCronIdempotencyKey: process.env.OUTBOUND_CRON_EXPECTED_IDEMPOTENCY_KEY || '',
     allowHttp: false,
@@ -321,6 +325,12 @@ function parseArgs(args) {
       i += 1;
     } else if (arg === '--inbound-receipt-id' && next) {
       values.inboundReceiptId = next;
+      i += 1;
+    } else if (arg === '--inbound-event-limit' && next) {
+      values.inboundEventLimit = Number(next);
+      i += 1;
+    } else if (arg === '--outbound-event-limit' && next) {
+      values.outboundEventLimit = Number(next);
       i += 1;
     } else if (arg === '--outbound-idempotency-key' && next) {
       values.outboundIdempotencyKey = next;

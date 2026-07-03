@@ -574,7 +574,7 @@ async function handleAdminPaymentEvents(req, res, config, paymentLedger, url) {
     });
   }
 
-  const limit = parseListLimit(url.searchParams.get('limit'), 50, 200);
+  const limit = parseListLimit(url.searchParams.get('limit'), 50, 2000);
   const events = await paymentLedger.list();
   return sendJson(res, 200, {
     ok: true,

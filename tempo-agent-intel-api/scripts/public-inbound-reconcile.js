@@ -127,7 +127,7 @@ function eventLimit(value) {
   if (!Number.isFinite(parsed) || parsed <= 0) {
     return DEFAULT_EVENT_LIMIT;
   }
-  return Math.min(Math.floor(parsed), 200);
+  return Math.min(Math.floor(parsed), 2000);
 }
 
 function assertStatus(result, expected, label) {
