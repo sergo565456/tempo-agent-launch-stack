@@ -18,9 +18,9 @@ const config = getConfig({
 const pointer = JSON.parse(await readFile(resolve(projectRoot, options.pointer), 'utf8'));
 const manifest = JSON.parse(await readFile(resolve(projectRoot, pointer.pool_manifest), 'utf8'));
 const currentBinding = buildMachineBinding();
-const expectedBindingHash = manifest.machine_binding?.binding_hash || pointer.machine_binding_hash || '';
+const allowedBindingHashes = getAllowedBindingHashes(pointer, manifest);
 
-if (options.requireMachineBinding && expectedBindingHash !== currentBinding.binding_hash) {
+if (options.requireMachineBinding && !allowedBindingHashes.includes(currentBinding.binding_hash)) {
   throw new Error('Current machine binding does not match canary pool manifest.');
 }
 
@@ -60,8 +60,9 @@ const summary = {
     symbol: manifest.token?.symbol || 'USDC.e',
     decimals: config.tempoTokenDecimals,
   },
-  machine_binding_ok: expectedBindingHash === currentBinding.binding_hash,
-  expected_machine_binding_hash: expectedBindingHash,
+  machine_binding_ok: allowedBindingHashes.includes(currentBinding.binding_hash),
+  expected_machine_binding_hash: allowedBindingHashes[0] || '',
+  allowed_machine_binding_hashes: allowedBindingHashes,
   current_machine_binding_hash: currentBinding.binding_hash,
   min_balance_required: formatBalance(minBalanceBaseUnits, config.tempoTokenDecimals),
   wallet_count: wallets.length,
@@ -172,4 +173,17 @@ function buildMachineBinding() {
     ...values,
     binding_hash: bindingHash,
   };
+}
+
+function getAllowedBindingHashes(pointer, manifest) {
+  return [
+    ...(Array.isArray(manifest.machine_binding?.allowed_binding_hashes) ? manifest.machine_binding.allowed_binding_hashes : []),
+    ...(Array.isArray(pointer.allowed_binding_hashes) ? pointer.allowed_binding_hashes : []),
+    manifest.machine_binding?.binding_hash,
+    pointer.machine_binding_hash,
+  ].filter((value, index, values) => (
+    typeof value === 'string' &&
+    /^[a-f0-9]{64}$/i.test(value) &&
+    values.indexOf(value) === index
+  ));
 }

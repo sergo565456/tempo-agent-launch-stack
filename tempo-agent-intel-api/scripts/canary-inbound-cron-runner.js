@@ -43,9 +43,9 @@ const pointer = JSON.parse(await readFile(pointerPath, 'utf8'));
 const manifestPath = resolve(projectRoot, pointer.pool_manifest);
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
 const currentBinding = buildMachineBinding();
-const expectedBindingHash = manifest.machine_binding?.binding_hash || pointer.machine_binding_hash || '';
+const allowedBindingHashes = getAllowedBindingHashes(pointer, manifest);
 
-if (options.requireMachineBinding && expectedBindingHash !== currentBinding.binding_hash) {
+if (options.requireMachineBinding && !allowedBindingHashes.includes(currentBinding.binding_hash)) {
   throw new Error('Current machine binding does not match canary pool manifest.');
 }
 
@@ -441,6 +441,19 @@ function buildMachineBinding() {
     computer_name: process.env.COMPUTERNAME || '',
   };
   return { ...values, binding_hash: createHash('sha256').update(JSON.stringify(values)).digest('hex') };
+}
+
+function getAllowedBindingHashes(pointer, manifest) {
+  return [
+    ...(Array.isArray(manifest.machine_binding?.allowed_binding_hashes) ? manifest.machine_binding.allowed_binding_hashes : []),
+    ...(Array.isArray(pointer.allowed_binding_hashes) ? pointer.allowed_binding_hashes : []),
+    manifest.machine_binding?.binding_hash,
+    pointer.machine_binding_hash,
+  ].filter((value, index, values) => (
+    typeof value === 'string' &&
+    /^[a-f0-9]{64}$/i.test(value) &&
+    values.indexOf(value) === index
+  ));
 }
 
 function decodeReceipt(header) {

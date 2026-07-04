@@ -11,8 +11,8 @@ const options = parseArgs(process.argv.slice(2));
 const pointer = JSON.parse(await readFile(resolve(projectRoot, options.pointer), 'utf8'));
 const manifest = JSON.parse(await readFile(resolve(projectRoot, pointer.pool_manifest), 'utf8'));
 const currentBinding = buildMachineBinding();
-const expectedHash = manifest.machine_binding?.binding_hash || pointer.machine_binding_hash || '';
-const ok = expectedHash === currentBinding.binding_hash;
+const allowedHashes = getAllowedBindingHashes(pointer, manifest);
+const ok = allowedHashes.includes(currentBinding.binding_hash);
 
 const summary = {
   ok,
@@ -21,7 +21,8 @@ const summary = {
   pool_id: manifest.pool_id,
   pool_status: manifest.status,
   wallet_count: Array.isArray(manifest.wallets) ? manifest.wallets.length : 0,
-  expected_machine_binding_hash: expectedHash,
+  expected_machine_binding_hash: allowedHashes[0] || '',
+  allowed_machine_binding_hashes: allowedHashes,
   current_machine_binding_hash: currentBinding.binding_hash,
   current_machine: {
     hostname: currentBinding.hostname,
@@ -37,6 +38,19 @@ const summary = {
 console.log(JSON.stringify(summary, null, 2));
 if (!ok) {
   process.exitCode = 1;
+}
+
+function getAllowedBindingHashes(pointer, manifest) {
+  return [
+    ...(Array.isArray(manifest.machine_binding?.allowed_binding_hashes) ? manifest.machine_binding.allowed_binding_hashes : []),
+    ...(Array.isArray(pointer.allowed_binding_hashes) ? pointer.allowed_binding_hashes : []),
+    manifest.machine_binding?.binding_hash,
+    pointer.machine_binding_hash,
+  ].filter((value, index, values) => (
+    typeof value === 'string' &&
+    /^[a-f0-9]{64}$/i.test(value) &&
+    values.indexOf(value) === index
+  ));
 }
 
 function parseArgs(args) {
