@@ -56,7 +56,20 @@ export function buildOpenApi(config) {
       version: '0.2.0',
       summary: 'Paid launch and diligence reports for agent-payment builders.',
       description: 'A machine-readable paid report API for builders launching x402, MPP, Tempo, Venice, and MCP agent services.',
+      contact: {
+        email: 'sergo565456@gmail.com',
+      },
       'x-guidance': 'Call a report endpoint with a target and decision question. If the server returns 402, pay using the advertised Tempo MPP offer and retry the same request with the same Idempotency-Key. Use GET /v1/reports/{report_id} with the original Idempotency-Key or receipt_id proof to retrieve a paid report.',
+    },
+    'x-discovery': {
+      ownershipProofs: [
+        'https://github.com/sergo565456/tempo-agent-launch-stack',
+        'https://www.mppscan.com/server/829a2ec0cd95651c49881e21e918a2635f6eea7e9454df284c095821b2f1a893',
+      ],
+    },
+    externalDocs: {
+      url: 'https://github.com/sergo565456/tempo-agent-launch-stack',
+      description: 'Public source, launch notes, and operator documentation.',
     },
     servers: [{ url: baseUrl }],
     components: {
